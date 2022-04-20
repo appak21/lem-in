@@ -51,6 +51,7 @@ func main() {
 	allPaths := paths.PathsCompute(graph)
 	if allPaths == nil {
 		fmt.Print(config.ErrNoPaths)
+		os.Exit(1)
 	}
 	paths.Lemin(allPaths, graph.Nants)
 }
