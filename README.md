@@ -1,7 +1,7 @@
 # lem-in
 
 ### Project instruction
-You can read the official instruction [from here](https://github.com/Zhadyra21/public/tree/master/subjects/lem-in) 
+You can read the official instruction [from here](https://github.com/01-edu/public/tree/master/subjects/lem-in) 
 
 # Overview
 
