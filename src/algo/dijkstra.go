@@ -7,7 +7,8 @@ import (
 
 const MaxNNodes = 100000
 
-func (pq PriorityQueue) Dijkstra(graph *antfarm.Graph) bool {
+func Dijkstra(graph *antfarm.Graph) bool {
+	pq := make(PriorityQueue, 0, 100)
 	var v, w string
 	GraphReset(graph)
 	heap.Push(&pq, &Node{v: 0, room: graph.Start})
@@ -15,7 +16,7 @@ func (pq PriorityQueue) Dijkstra(graph *antfarm.Graph) bool {
 		v = heap.Pop(&pq).(*Node).room
 		for link := (*graph.Rooms[v]).Edges.Front(); link != nil; link = link.Next() {
 			w = link.Value.(string)
-			(&pq).RelaxEdge(graph, v, w)
+			RelaxEdge(graph, &pq, v, w)
 		}
 	}
 	SetPrices(graph)
@@ -36,7 +37,7 @@ func GraphReset(graph *antfarm.Graph) {
 	node.CostOut = 0
 }
 
-func (pq *PriorityQueue) RelaxEdge(graph *antfarm.Graph, v, w string) {
+func RelaxEdge(graph *antfarm.Graph, pq *PriorityQueue, v, w string) {
 	nodeV := *graph.Rooms[v]
 	nodeW := *graph.Rooms[w]
 	if v == graph.End || w == graph.Start || nodeW.Parent == v {
@@ -46,16 +47,16 @@ func (pq *PriorityQueue) RelaxEdge(graph *antfarm.Graph, v, w string) {
 		nodeW.EdgeOut = v
 		nodeW.CostOut = nodeV.CostIn - 1 + nodeV.PriceIn - nodeW.PriceOut
 		heap.Push(pq, &Node{v: nodeW.CostOut, room: w})
-		pq.RelaxHiddenEdge(graph, w)
+		RelaxHiddenEdge(graph, pq, w)
 	} else if nodeV.Parent != w && nodeV.CostOut < MaxNNodes && -1+nodeW.CostIn > nodeV.CostOut+nodeV.PriceOut-nodeW.PriceIn {
 		nodeW.EdgeIn = v
 		nodeW.CostIn = nodeV.CostOut + 1 + nodeV.PriceOut - nodeW.PriceIn
 		heap.Push(pq, &Node{v: nodeW.CostIn, room: w})
-		pq.RelaxHiddenEdge(graph, w)
+		RelaxHiddenEdge(graph, pq, w)
 	}
 }
 
-func (pq *PriorityQueue) RelaxHiddenEdge(graph *antfarm.Graph, w string) {
+func RelaxHiddenEdge(graph *antfarm.Graph, pq *PriorityQueue, w string) {
 	node := *graph.Rooms[w]
 	if node.Split && node.CostIn > node.CostOut+node.PriceOut-node.PriceIn && w != graph.Start {
 		node.EdgeIn = node.EdgeOut

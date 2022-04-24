@@ -4,6 +4,7 @@ import (
 	"container/list"
 	"lemin/src/algo"
 	"lemin/src/antfarm"
+	"sort"
 )
 
 func PathsCompute(graph *antfarm.Graph) *Paths {
@@ -35,16 +36,15 @@ func PathsGetNext(graph *antfarm.Graph) *Paths {
 func PathsFromGraph(graph *antfarm.Graph) *Paths {
 	paths := new(Paths)
 	paths.Npaths = graph.Exits.Len()
-	pA := make([]int, graph.Nants)
-	paths.Assignments = &pA
-	paths.Arr = make([]**list.List, paths.Npaths)
+	paths.AllPaths = make([]**list.List, paths.Npaths)
 	i := 0
 	for link := graph.Exits.Front(); link != nil; link = link.Next() {
 		p := unrollPath(graph, link.Value.(string))
-		paths.Arr[i] = &p
+		paths.AllPaths[i] = &p
 		i++
 	}
-	paths.pathsAssign(graph.Nants)
+	sort.Slice(paths.AllPaths, func(i, j int) bool { return (*paths.AllPaths[i]).Len() < (*paths.AllPaths[j]).Len() })
+	paths.Nsteps = paths.calcSteps(graph.Nants)
 	return paths
 }
 

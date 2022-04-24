@@ -2,64 +2,49 @@ package paths
 
 import (
 	"container/list"
-	"math"
-	"sort"
 )
 
 type Paths struct {
 	Npaths, Nsteps int
-	Arr            []**list.List //all paths
-	Assignments    *[]int        //the number of ants that should take each path
+	AllPaths       []**list.List
+	Assignment     []int //groups of ants for each path
 }
 
 func (paths *Paths) pathLen(i int) int {
-	return (*paths.Arr[i]).Len()
+	return (*paths.AllPaths[i]).Len()
 }
 
-func (paths *Paths) pathsAssign(nants int) {
-	var nStepsOld, nStepsNew int
-	var assignmentsNew *[]int
-	pA := make([]int, nants)
-	assignmentsNew = &pA
-	nStepsOld = math.MaxInt
-	sort.Slice(paths.Arr, func(i, j int) bool { return (*paths.Arr[i]).Len() < (*paths.Arr[j]).Len() })
-	i := 1
-	for i <= paths.Npaths && nStepsOld > paths.pathLen(i-1) {
-		nStepsNew = paths.pathsAssignOnce(nants, i, assignmentsNew)
-		paths.pathsReassign(assignmentsNew)
-		nStepsOld = nStepsNew
-		i++
+func (paths *Paths) calcSteps(nants int) int {
+	l := len(paths.AllPaths) - 1
+	shortest := paths.pathLen(0)
+	longest := paths.pathLen(l)
+	var sum int
+	for i := 0; i < paths.Npaths; i++ {
+		sum += longest - paths.pathLen(i)
 	}
-	paths.Nsteps = nStepsOld
+	numOfAnts := longest - shortest + (nants-sum)/paths.Npaths
+	rem := (nants - sum) % paths.Npaths
+	if rem > 0 {
+		numOfAnts++
+	}
+	return shortest + numOfAnts - 1
 }
 
-func (paths *Paths) pathsAssignOnce(nants, nused int, assignmentsNew *[]int) int {
-	var nStepsNew, i int
-	for i+1 < nused {
-		nants -= paths.pathLen(nused-1) - paths.pathLen(i)
-		if paths.pathLen(nused-1) > paths.pathLen(i) {
-			(*assignmentsNew)[i] = paths.pathLen(nused-1) - paths.pathLen(i)
-		} else {
-			(*assignmentsNew)[i] = 0
+func (paths *Paths) antsSplit(nants int) {
+	paths.Assignment = make([]int, paths.Npaths)
+	l := len(paths.AllPaths) - 1
+	longest := paths.pathLen(l)
+	var sum int
+	for i := 0; i < paths.Npaths; i++ {
+		sum += longest - paths.pathLen(i)
+	}
+	fn := float32(nants-sum) / float32(paths.Npaths)
+	remSteps := (fn - float32(int(fn))) * float32(paths.Npaths)
+	for i := 0; i < paths.Npaths; i++ {
+		paths.Assignment[i] = longest - paths.pathLen(i) + int(fn)
+		if remSteps > 0 {
+			paths.Assignment[i]++
+			remSteps--
 		}
-		i++
-	}
-	i = 0
-	for i < nused {
-		(*assignmentsNew)[i] += nants / nused
-		if i < nants%nused {
-			(*assignmentsNew)[i] += 1
-		}
-		i++
-	}
-	nStepsNew = paths.pathLen(0) + (*assignmentsNew)[0] - 1
-	return nStepsNew
-}
-
-func (paths *Paths) pathsReassign(assignmentsNew *[]int) {
-	i := 0
-	for i < paths.Npaths {
-		(*paths.Assignments)[i] = (*assignmentsNew)[i]
-		i++
 	}
 }

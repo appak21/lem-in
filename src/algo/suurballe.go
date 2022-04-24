@@ -5,8 +5,7 @@ import (
 )
 
 func Suurballe(graph *antfarm.Graph) bool {
-	openList := make(PriorityQueue, 0, 100)
-	if !openList.Dijkstra(graph) {
+	if !Dijkstra(graph) {
 		return false
 	}
 	CachePath(graph)
