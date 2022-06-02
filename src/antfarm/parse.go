@@ -72,7 +72,7 @@ func (graph *Graph) ParseLinks(line string) error {
 		return fmt.Errorf("the %v room is linked to itself: %v", room1, line)
 	}
 	node1 := *graph.Rooms[room1]
-	node1.Edges[room2] = 1
+	node1.Edges[room2] = 1 //map's value won't be used
 	node2 := *graph.Rooms[room2]
 	node2.Edges[room1] = 1
 	return nil
