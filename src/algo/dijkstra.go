@@ -9,13 +9,12 @@ const MaxNNodes = 100000
 
 func Dijkstra(graph *antfarm.Graph) bool {
 	pq := make(PriorityQueue, 0, 100)
-	var v, w string
+	var v string
 	GraphReset(graph)
 	heap.Push(&pq, &Node{v: 0, room: graph.Start})
 	for pq.Len() > 0 {
 		v = heap.Pop(&pq).(*Node).room
-		for link := (*graph.Rooms[v]).Edges.Front(); link != nil; link = link.Next() {
-			w = link.Value.(string)
+		for w := range (*graph.Rooms[v]).Edges {
 			RelaxEdge(graph, &pq, v, w)
 		}
 	}

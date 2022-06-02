@@ -17,7 +17,7 @@ type parseInfo struct {
 }
 
 type Node struct {
-	Edges             *list.List
+	Edges             map[string]byte
 	Parent            string
 	EdgeIn, EdgeOut   string
 	PriceIn, PriceOut int

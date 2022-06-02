@@ -41,7 +41,7 @@ func (graph *Graph) ParseRooms(line string) error {
 			return fmt.Errorf("the %v room is duplicated", room)
 		}
 		if room != "" {
-			node := &Node{Parent: "L", Edges: list.New()}
+			node := &Node{Parent: "L", Edges: make(map[string]byte)}
 			if graph.data.startFound && graph.Start == "" {
 				graph.Start = room
 			} else if graph.data.endFound && graph.End == "" {
@@ -72,9 +72,9 @@ func (graph *Graph) ParseLinks(line string) error {
 		return fmt.Errorf("the %v room is linked to itself: %v", room1, line)
 	}
 	node1 := *graph.Rooms[room1]
-	node1.Edges.PushBack(room2)
+	node1.Edges[room2] = 1
 	node2 := *graph.Rooms[room2]
-	node2.Edges.PushBack(room1)
+	node2.Edges[room1] = 1
 	return nil
 }
 
