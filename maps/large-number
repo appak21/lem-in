@@ -1,4 +1,4 @@
-20
+2147483647
 ##start
 O 0 3
 A 2 5
@@ -15,4 +15,21 @@ D 4 6
 J 6 7
 ##end
 Z 8 3
-O-Z
+O-A
+B-O
+C-O
+A-B
+B-E
+iL-B
+iL-K
+K-N
+G-N
+G-Z
+E-M
+M-Z
+C-E
+E-F
+F-D
+D-J
+J-Z
+O-E
